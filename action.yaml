@@ -1,119 +1,119 @@
-name: 'Aqua Security Trivy'
-description: 'Scans container images for vulnerabilities with Trivy'
-author: 'Aqua Security'
+name: "Aqua Security Trivy"
+description: "Scans container images for vulnerabilities with Trivy"
+author: "Aqua Security"
 
 inputs:
   scan-type:
-    description: 'Scan type to use for scanning vulnerability'
+    description: "Scan type to use for scanning vulnerability"
     required: false
-    default: 'image'
+    default: "image"
   image-ref:
-    description: 'image reference(for backward compatibility)'
+    description: "image reference(for backward compatibility)"
     required: false
   input:
-    description: 'reference of tar file to scan'
+    description: "reference of tar file to scan"
     required: false
-    default: ''
+    default: ""
   scan-ref:
-    description: 'Scan reference'
+    description: "Scan reference"
     required: false
-    default: '.'
+    default: "."
   exit-code:
-    description: 'exit code when vulnerabilities were found'
+    description: "exit code when vulnerabilities were found"
     required: false
   ignore-unfixed:
-    description: 'ignore unfixed vulnerabilities'
+    description: "ignore unfixed vulnerabilities"
     required: false
-    default: 'false'
+    default: "false"
   vuln-type: # TODO: rename to pkg-types
-    description: 'comma-separated list of vulnerability types (os,library)'
+    description: "comma-separated list of vulnerability types (os,library)"
     required: false
-    default: 'os,library'
+    default: "os,library"
   severity:
-    description: 'severities of vulnerabilities to be displayed'
+    description: "severities of vulnerabilities to be displayed"
     required: false
-    default: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+    default: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
   format:
-    description: 'output format (table, json, template)'
+    description: "output format (table, json, template)"
     required: false
-    default: 'table'
+    default: "table"
   template:
-    description: 'use an existing template for rendering output (@/contrib/gitlab.tpl, @/contrib/junit.tpl, @/contrib/html.tpl)'
+    description: "use an existing template for rendering output (@/contrib/gitlab.tpl, @/contrib/junit.tpl, @/contrib/html.tpl)"
     required: false
-    default: ''
+    default: ""
   output:
-    description: 'writes results to a file with the specified file name'
+    description: "writes results to a file with the specified file name"
     required: false
-    default: ''
+    default: ""
   skip-dirs:
-    description: 'comma separated list of directories where traversal is skipped'
+    description: "comma separated list of directories where traversal is skipped"
     required: false
-    default: ''
+    default: ""
   skip-files:
-    description: 'comma separated list of files to be skipped'
+    description: "comma separated list of files to be skipped"
     required: false
-    default: ''
+    default: ""
   cache-dir:
-    description: 'specify where the cache is stored'
+    description: "specify where the cache is stored"
     required: false
-    default: '${{ github.workspace }}/.cache/trivy'
+    default: "${{ github.workspace }}/.cache/trivy"
   timeout:
-    description: 'timeout (default 5m0s)'
+    description: "timeout (default 5m0s)"
     required: false
-    default: ''
+    default: ""
   ignore-policy:
-    description: 'filter vulnerabilities with OPA rego language'
+    description: "filter vulnerabilities with OPA rego language"
     required: false
-    default: ''
+    default: ""
   hide-progress:
-    description: 'suppress progress bar and log output'
+    description: "suppress progress bar and log output"
     required: false
   list-all-pkgs:
-    description: 'output all packages regardless of vulnerability'
+    description: "output all packages regardless of vulnerability"
     required: false
-    default: 'false'
+    default: "false"
   scanners:
-    description: 'comma-separated list of what security issues to detect'
+    description: "comma-separated list of what security issues to detect"
     required: false
-    default: ''
+    default: ""
   trivyignores:
-    description: 'comma-separated list of relative paths in repository to one or more .trivyignore files'
+    description: "comma-separated list of relative paths in repository to one or more .trivyignore files"
     required: false
-    default: ''
+    default: ""
   github-pat:
-    description: 'GitHub Personal Access Token (PAT) for submitting SBOM to GitHub Dependency Snapshot API'
+    description: "GitHub Personal Access Token (PAT) for submitting SBOM to GitHub Dependency Snapshot API"
     required: false
   trivy-config:
-    description: 'path to trivy.yaml config'
+    description: "path to trivy.yaml config"
     required: false
   tf-vars:
     description: "path to terraform tfvars file"
     required: false
   limit-severities-for-sarif:
-    description: 'limit severities for SARIF format'
+    description: "limit severities for SARIF format"
     required: false
   docker-host:
-    description: 'unix domain socket path to use for docker scanning, ex. unix:///var/run/docker.sock'
+    description: "unix domain socket path to use for docker scanning, ex. unix:///var/run/docker.sock"
     required: false
   version:
-    description: 'Trivy version to use'
+    description: "Trivy version to use"
     required: false
-    default: 'v0.56.1'
+    default: "v0.56.1"
   cache:
-    description: 'Used to specify whether caching is needed. Set to false, if you would like to disable caching.'
+    description: "Used to specify whether caching is needed. Set to false, if you would like to disable caching."
     required: false
-    default: 'true'
+    default: "true"
   skip-setup-trivy:
-    description: 'skip calling the setup-trivy action to install trivy'
+    description: "skip calling the setup-trivy action to install trivy"
     required: false
-    default: 'false'
+    default: "false"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install Trivy
       if: ${{ inputs.skip-setup-trivy == 'false' }}
-      uses: aquasecurity/setup-trivy@v0.2.1
+      uses: telia-actions/setup-trivy@v0.2.2
       with:
         version: ${{ inputs.version }}
         cache: ${{ inputs.cache }}
@@ -149,12 +149,12 @@ runs:
           local var_name="$1"
           local input_value="$2"
           local default_value="$3"
-        
+
           if [ ! -z "$input_value" ] && [ "$input_value" != "$default_value" ]; then
             echo "$var_name=$input_value" >> $GITHUB_ENV
           fi
         }
-        
+
         # Set environment variables, handling those with default values
         # cf. https://aquasecurity.github.io/trivy/latest/docs/configuration/#environment-variables
         set_env_var_if_provided "TRIVY_INPUT" "${{ inputs.input }}" ""
